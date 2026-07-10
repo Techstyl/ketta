@@ -4,9 +4,9 @@ services:
     env: node
     region: frankfurt
     plan: free
+    rootDir: backend
     buildCommand: npm install && npm run build
     startCommand: npm start
-    healthCheckPath: /api/auth/health
     envVars:
       - key: NODE_VERSION
         value: 20
