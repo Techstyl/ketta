@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_service.dart';
 import '../models/user.dart';
+import '../models/product.dart';
 
 class AdminService {
   final ApiService _api;
@@ -42,6 +43,17 @@ class AdminService {
     }
   }
 
+  Future<Map<String, int>> getStats() async {
+    final data = await _api.get('/admin/stats');
+    return {
+      'users': data['users'] as int? ?? 0,
+      'products': data['products'] as int? ?? 0,
+      'active': data['active'] as int? ?? 0,
+      'sold': data['sold'] as int? ?? 0,
+      'inquiries': data['inquiries'] as int? ?? 0,
+    };
+  }
+
   Future<List<AppUser>> getAllUsers() async {
     final data = await _api.getList('/admin/users');
     return data.map((e) => AppUser.fromJson(e as Map<String, dynamic>)).toList();
@@ -49,6 +61,15 @@ class AdminService {
 
   Future<void> deleteUser(String userId) async {
     await _api.delete('/admin/users/$userId');
+  }
+
+  Future<List<Product>> getAllProducts() async {
+    final data = await _api.getList('/admin/products');
+    return data.map((e) => Product.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  Future<void> deleteProduct(String productId) async {
+    await _api.delete('/admin/products/$productId');
   }
 }
 

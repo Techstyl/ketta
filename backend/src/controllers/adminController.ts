@@ -83,6 +83,33 @@ export async function deleteUser(req: AuthRequest, res: Response) {
   }
 }
 
+export async function getProducts(_req: AuthRequest, res: Response) {
+  try {
+    const result = await pool.query(
+      `SELECT p.*, u.username as farmer_name, u.location as farmer_location, c.name as category_name
+       FROM products p
+       LEFT JOIN users u ON p.farmer_id = u.id
+       LEFT JOIN categories c ON p.category_id = c.id
+       ORDER BY p.created_at DESC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('GetProducts error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+export async function deleteProductAdmin(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM products WHERE id = $1', [id]);
+    res.json({ message: 'Deleted' });
+  } catch (error) {
+    console.error('DeleteProductAdmin error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 export async function getStats(_req: AuthRequest, res: Response) {
   try {
     const [users, products, active, sold, inquiries] = await Promise.all([
