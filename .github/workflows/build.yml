@@ -14,7 +14,10 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
+      - name: Install Android SDK platform
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" 2>/dev/null || true
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.44.5'

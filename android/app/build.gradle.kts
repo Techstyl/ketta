@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.ketta.app"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
