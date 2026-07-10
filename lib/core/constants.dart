@@ -1,7 +1,7 @@
 class AppConstants {
   static const String appName = 'ቀጥታ';
   static const String appNameEn = 'KeTta';
-  static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'https://ketta-backend.onrender.com';
   static const String apiUrl = '$baseUrl/api';
   static const String socketUrl = baseUrl;
 
