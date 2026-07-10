@@ -15,21 +15,43 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Install Android SDK platform
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" 2>/dev/null || true
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.44.5'
           channel: 'stable'
+      - name: Accept Android licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
       - run: flutter pub get
         working-directory: .
-      - run: flutter build apk --release
+      - name: Build APK (attempt 1)
+        id: build1
+        continue-on-error: true
+        run: flutter build apk --release 2>&1 | tee build.log
+        working-directory: .
+      - name: Try debug build if release failed
+        if: steps.build1.outcome == 'failure'
+        run: flutter build apk --debug 2>&1 | tee -a build.log
         working-directory: .
       - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-logs
+          path: build.log
+      - uses: actions/upload-artifact@v4
+        if: steps.build1.outcome == 'success'
         with:
           name: ketta-android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+      - uses: actions/upload-artifact@v4
+        if: steps.build1.outcome == 'failure' && hashFiles('build/app/outputs/flutter-apk/app-debug.apk') != ''
+        with:
+          name: ketta-android-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: gradle-cache
+          path: ~/.gradle/wrapper/dists/
 
   web:
     name: Build Web App
