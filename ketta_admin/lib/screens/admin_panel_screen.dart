@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme.dart';
-import '../../core/localization.dart';
-import '../../services/admin_service.dart';
-import '../../models/user.dart';
-import '../../models/product.dart';
+import '../core/theme.dart';
+import '../core/localization.dart';
+import '../services/admin_service.dart';
+import '../services/api_service.dart';
+import '../models/user.dart';
+import '../models/product.dart';
 
 class AdminPanelScreen extends ConsumerStatefulWidget {
   const AdminPanelScreen({super.key});
@@ -63,19 +64,20 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: Text(AppStrings.adminPanel)),
+        appBar: AppBar(title: const Text('KeTta Admin')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppStrings.adminPanel),
+        title: const Text('KeTta Admin'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () { setState(() => _loading = true); _loadData(); },
-          ),
+          IconButton(icon: const Icon(Icons.logout), onPressed: () async {
+            await ref.read(apiServiceProvider).clearToken();
+            if (context.mounted) Navigator.pushReplacementNamed(context, '/login');
+          }),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: () { setState(() => _loading = true); _loadData(); }),
         ],
       ),
       body: Column(
@@ -88,34 +90,35 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   }
 
   Widget _buildTabs() {
+    final tabs = [
+      ('dashboard', Icons.dashboard, 'Dashboard'),
+      ('users', Icons.people, 'Users (${_stats['users'] ?? _users.length})'),
+      ('products', Icons.inventory_2, 'Products (${_stats['products'] ?? _products.length})'),
+      ('settings', Icons.settings, 'Settings'),
+    ];
     return Row(
-      children: [
-        _tabBtn('dashboard', Icons.dashboard, 'Dashboard'),
-        _tabBtn('users', Icons.people, 'Users (${_stats['users'] ?? _users.length})'),
-        _tabBtn('products', Icons.inventory_2, 'Products (${_stats['products'] ?? _products.length})'),
-        _tabBtn('settings', Icons.settings, 'Settings'),
-      ].map((w) => Expanded(child: w)).toList(),
-    );
-  }
-
-  Widget _tabBtn(String tab, IconData icon, String label) {
-    final active = _tab == tab;
-    return GestureDetector(
-      onTap: () => setState(() => _tab = tab),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: active ? AppTheme.primaryGreen : Colors.transparent, width: 3)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 20, color: active ? AppTheme.primaryGreen : Colors.grey),
-            const SizedBox(height: 4),
-            Text(label, style: TextStyle(fontSize: 11, color: active ? AppTheme.primaryGreen : Colors.grey, fontWeight: active ? FontWeight.bold : FontWeight.normal)),
-          ],
-        ),
-      ),
+      children: tabs.map((t) {
+        final active = _tab == t.$1;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _tab = t.$1),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: active ? AppTheme.primaryGreen : Colors.transparent, width: 3)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(t.$2, size: 20, color: active ? AppTheme.primaryGreen : Colors.grey),
+                  const SizedBox(height: 4),
+                  Text(t.$3, style: TextStyle(fontSize: 11, color: active ? AppTheme.primaryGreen : Colors.grey, fontWeight: active ? FontWeight.bold : FontWeight.normal)),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 

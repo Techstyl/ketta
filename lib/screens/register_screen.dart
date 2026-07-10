@@ -50,7 +50,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
       if (!mounted) return;
       ref.invalidate(currentUserProvider);
-      final route = user.isAdmin ? '/admin' : (user.isFarmer ? '/farmer-dashboard' : '/buyer-home');
+      final route = user.isFarmer ? '/farmer-dashboard' : '/buyer-home';
       Navigator.pushNamedAndRemoveUntil(context, route, (_) => false);
     } catch (e) {
       if (!mounted) return;

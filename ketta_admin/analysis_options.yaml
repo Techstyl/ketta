@@ -1,0 +1,8 @@
+analyzer:
+  errors:
+    deprecated_member_use: ignore
+    unused_import: warning
+
+linter:
+  rules:
+    avoid_print: false

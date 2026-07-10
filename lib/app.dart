@@ -15,8 +15,6 @@ import 'screens/buyer/product_detail_screen.dart';
 import 'screens/buyer/favorites_screen.dart';
 import 'screens/chat_screen.dart';
 import 'screens/settings_screen.dart';
-import 'screens/admin/admin_panel_screen.dart';
-
 class KettaApp extends ConsumerStatefulWidget {
   const KettaApp({super.key});
 
@@ -66,7 +64,6 @@ class _KettaAppState extends ConsumerState<KettaApp> {
         '/buyer-inquiries': (context) => const BuyerInquiriesScreen(),
         '/chat': (context) => const ChatScreen(),
         '/settings': (context) => const SettingsScreen(),
-        '/admin': (context) => const AdminPanelScreen(),
       },
     );
   }

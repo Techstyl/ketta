@@ -41,7 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateHome(dynamic user) {
-    final route = user.isAdmin ? '/admin' : (user.isFarmer ? '/farmer-dashboard' : '/buyer-home');
+    final route = user.isFarmer ? '/farmer-dashboard' : '/buyer-home';
     Navigator.pushNamedAndRemoveUntil(context, route, (_) => false);
   }
 
