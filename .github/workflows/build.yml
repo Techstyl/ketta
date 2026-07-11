@@ -21,16 +21,24 @@ jobs:
           channel: 'stable'
       - name: Accept Android licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+      - name: Install Android SDK platform & build-tools
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0" 2>/dev/null || true
       - run: flutter pub get
         working-directory: .
-      - name: Build APK (attempt 1)
+      - name: Build APK
         id: build1
-        continue-on-error: true
-        run: flutter build apk --release 2>&1 | tee build.log
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter build apk --release --verbose 2>&1 | tee build.log
         working-directory: .
       - name: Try debug build if release failed
         if: steps.build1.outcome == 'failure'
-        run: flutter build apk --debug 2>&1 | tee -a build.log
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter build apk --debug --verbose 2>&1 | tee -a build.log
         working-directory: .
       - uses: actions/upload-artifact@v4
         if: always()
